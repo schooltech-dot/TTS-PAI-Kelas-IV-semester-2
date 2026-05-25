@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TTS Bab 6 PAI Kelas 4</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',Arial,sans-serif;background:#1a1f2e;min-height:100vh;padding:24px}
+.wrap{max-width:960px;margin:0 auto;background:#242b3d;border-radius:14px;padding:28px;border:1px solid #2e3a52}
+.hdr{text-align:center;margin-bottom:22px;padding-bottom:16px;border-bottom:1px solid #2e3a52}
+.hdr h1{font-size:20px;font-weight:700;color:#7ecfb3}
+.hdr p{font-size:12.5px;color:#a0aec0;margin-top:4px}
+.body{display:flex;gap:28px;align-items:flex-start}
+.grid-side{flex:0 0 auto}
+table.tts{border-collapse:collapse;border:3px solid #111}
+table.tts td{width:34px;height:34px;padding:0;position:relative;border:2px solid #111;background:#fff}
+table.tts td.blk{background:#111;border-color:#111}
+.cnum{position:absolute;top:2px;left:3px;font-size:8px;line-height:1;color:#111;pointer-events:none;z-index:2;font-weight:700}
+table.tts td input{display:block;width:100%;height:100%;border:none;outline:none;background:transparent;text-align:center;font-size:14px;font-weight:700;text-transform:uppercase;color:#111;cursor:pointer;padding:0;font-family:'Segoe UI',Arial,sans-serif}
+table.tts td.hl-word{background:#dff0ea}
+table.tts td.hl-cur{background:#7ecfb3}
+table.tts td.ok-cell{background:#c8ecd8!important}
+table.tts td.no-cell{background:#e83535!important;color:#fff!important}
+.clue-side{flex:1;min-width:220px;background:#f0f4f8;border-radius:10px;padding:16px;border:1px solid #d0dae8}
+.cs-title{font-size:11px;font-weight:700;color:#2a6a58;letter-spacing:.1em;text-transform:uppercase;margin:0 0 10px;padding-bottom:6px;border-bottom:2px solid #7ecfb3}
+.ci{font-size:12.5px;color:#1a2a3a;padding:5px 8px;border-radius:6px;cursor:pointer;margin-bottom:3px;border:1px solid transparent;line-height:1.5}
+.ci:hover{background:#ddeef8;border-color:#aacce8}
+.ci.act{background:#c8e8f8;color:#0a3a6a;border-color:#7ab8e0;font-weight:600}
+.ci.done{color:#4a8a60;text-decoration:line-through;opacity:.6}
+.ci b{font-weight:700;margin-right:5px;color:#2a6a58}
+.ci.act b{color:#0a5a8a}
+.sec{margin-bottom:16px}
+.btns{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap}
+.btns button{font-size:12.5px;padding:7px 16px;border-radius:8px;border:1px solid #3a4a66;background:#1e2535;color:#c0cce0;cursor:pointer;font-family:'Segoe UI',Arial,sans-serif;font-weight:500}
+.btns button:hover{background:#2a3550;color:#e0eaf8}
+.btns button.primary{background:#2a6a58;color:#a0e8c8;border-color:#3a8a70}
+.btns button.primary:hover{background:#306a58}
+.status{font-size:13px;color:#a0aec0;margin-top:10px;padding:7px 12px;background:#1e2535;border-radius:7px;border:1px solid #2e3a52;display:none}
+.win{display:none;font-size:13px;font-weight:600;color:#7ecfb3;background:#1a3530;border-radius:8px;padding:10px 14px;margin-top:10px;border:1px solid #3a8a70}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hdr">
+    <h1>Teka-Teki Silang — Bab 6 PAI Kelas 4</h1>
+    <p>Q.S. At-Tīn &amp; Hadis tentang Silaturahmi</p>
+  </div>
+  <div class="body">
+    <div class="grid-side">
+      <table class="tts" id="tbl"></table>
+      <div class="btns">
+        <button class="primary" onclick="cek()">Cek Jawaban</button>
+        <button onclick="resetGrid()">Reset</button>
+        
+      </div>
+      <div class="status" id="st"></div>
+      <div class="win" id="win">&#127881; Selamat! Semua jawaban benar!</div>
+    </div>
+    <div class="clue-side">
+      <div class="sec">
+        <div class="cs-title">Mendatar &rarr;</div>
+        <div id="ca"></div>
+      </div>
+      <div class="sec">
+        <div class="cs-title">Menurun &darr;</div>
+        <div id="cd"></div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+var R=13, C=13;
+
+var wordDefs=[
+  {w:'TIN',        r:0,  c:0,  d:'A', q:'Nama buah pada judul surah ke-95 Al-Quran'},
+  {w:'ZAITUN',     r:0,  c:4,  d:'A', q:'Buah yang disebut bersama tin dalam sumpah Allah (ayat 1)'},
+  {w:'MAKKIYAH',   r:2,  c:0,  d:'A', q:'Golongan surah yang diturunkan sebelum hijrah'},
+  {w:'SINAI',      r:4,  c:1,  d:'A', q:'Gunung tempat Nabi Musa bermunajat kepada Allah'},
+  {w:'SILATURAHMI',r:6,  c:0,  d:'A', q:'Tali persaudaraan yang diperintahkan Nabi saw'},
+  {w:'NERAKA',     r:8,  c:2,  d:'A', q:'Tempat serendah-rendahnya bagi yang durhaka kepada Allah'},
+  {w:'AKAL',       r:10, c:0,  d:'A', q:'Kelebihan manusia yang tidak dimiliki hewan'},
+  {w:'HAKIM',      r:10, c:6,  d:'A', q:'Sebutan Allah dalam ayat 8: "Bukankah Allah ___ yang paling adil"'},
+  {w:'TARTIL',     r:12, c:4,  d:'A', q:'Cara membaca Al-Quran dengan memperhatikan tajwid'},
+  {w:'TAQWIM',     r:0,  c:0,  d:'D', q:'"Ahsani ___" artinya bentuk yang sebaik-baiknya (ayat 4)'},
+  {w:'ISA',        r:0,  c:4,  d:'D', q:'Nabi yang diutus di wilayah Syam/Palestina'},
+  {w:'MUSA',       r:0,  c:9,  d:'D', q:'Nabi yang bermunajat di Gunung Sinai Mesir'},
+  {w:'AMAL',       r:2,  c:2,  d:'D', q:'Perbuatan baik yang mendatangkan pahala tidak putus-putusnya'},
+  {w:'IMAN',       r:4,  c:6,  d:'D', q:'Syarat selamat dari neraka menurut ayat 6 At-Tin'},
+  {w:'PAHALA',     r:6,  c:10, d:'D', q:'Balasan tidak putus-putusnya bagi orang beriman dan beramal saleh'},
+];
+
+// Bangun grid dari definisi kata
+var gd=[];
+for(var i=0;i<R;i++){gd.push([]);for(var j=0;j<C;j++) gd[i].push(null);}
+wordDefs.forEach(function(w){
+  for(var i=0;i<w.w.length;i++){
+    var r=w.d==='A'?w.r:w.r+i, c=w.d==='A'?w.c+i:w.c;
+    if(!gd[r][c]) gd[r][c]={letter:w.w[i]};
+    else gd[r][c].letter=w.w[i];
+  }
+});
+
+// Kumpulkan semua posisi awal kata yang valid
+var startCells={}; // key "r,c" -> true
+wordDefs.forEach(function(w){
+  var key=w.r+','+w.c;
+  startCells[key]=true;
+});
+
+// Nomori posisi awal urut atas-bawah kiri-kanan
+var cellNum=[];
+for(var i=0;i<R;i++){cellNum.push([]);for(var j=0;j<C;j++) cellNum[i].push(0);}
+var counter=1;
+for(var r=0;r<R;r++){
+  for(var c=0;c<C;c++){
+    if(startCells[r+','+c]){
+      cellNum[r][c]=counter++;
+    }
+  }
+}
+
+// Assign nomor ke kata
+var words=[];
+wordDefs.forEach(function(wd){
+  var num=cellNum[wd.r][wd.c];
+  if(num>0) words.push({id:num, w:wd.w, r:wd.r, c:wd.c, d:wd.d, q:wd.q});
+});
+
+var wordsA=words.filter(function(w){return w.d==='A';}).sort(function(a,b){return a.id-b.id;});
+var wordsD=words.filter(function(w){return w.d==='D';}).sort(function(a,b){return a.id-b.id;});
+
+// Render grid
+var tbl=document.getElementById('tbl');
+for(var r=0;r<R;r++){
+  var tr=document.createElement('tr');
+  for(var c=0;c<C;c++){
+    var td=document.createElement('td');
+    if(!gd[r][c]){td.className='blk';}
+    else{
+      if(cellNum[r][c]>0){
+        var sp=document.createElement('span');
+        sp.className='cnum';sp.textContent=cellNum[r][c];td.appendChild(sp);
+      }
+      var inp=document.createElement('input');
+      inp.type='text';inp.maxLength=1;
+      (function(rr,cc){
+        inp.addEventListener('mousedown',function(e){e.preventDefault();selCell(rr,cc);this.focus();});
+        inp.addEventListener('keydown',function(e){onKey(e,rr,cc);});
+        inp.addEventListener('input',function(e){onInp(e,rr,cc);});
+      })(r,c);
+      td.appendChild(inp);
+    }
+    tr.appendChild(td);
+  }
+  tbl.appendChild(tr);
+}
+
+var aw=null,adir='A',ar=0,ac=0;
+function getInp(r,c){return document.querySelector('#tbl tr:nth-child('+(r+1)+') td:nth-child('+(c+1)+') input');}
+function getTd(r,c){return document.querySelector('#tbl tr:nth-child('+(r+1)+') td:nth-child('+(c+1)+')');}
+
+function wordAt(r,c,dir){
+  for(var i=0;i<words.length;i++){
+    var w=words[i];if(w.d!==dir) continue;
+    for(var j=0;j<w.w.length;j++){
+      var wr=w.d==='A'?w.r:w.r+j,wc=w.d==='A'?w.c+j:w.c;
+      if(wr===r&&wc===c) return w;
+    }
+  }
+  return null;
+}
+
+function selCell(r,c,dir){
+  if(!gd[r]||!gd[r][c]) return;
+  var d=dir||adir;
+  var w=wordAt(r,c,d);
+  if(!w){d=d==='A'?'D':'A';w=wordAt(r,c,d);}
+  if(!w) return;
+  if(aw&&aw.id===w.id&&aw.d===w.d&&ar===r&&ac===c){
+    var nd=adir==='A'?'D':'A';var nw=wordAt(r,c,nd);
+    if(nw){w=nw;d=nd;}
+  }
+  aw=w;adir=d;ar=r;ac=c;
+  highlight();hlClue();
+  var inp=getInp(r,c);if(inp) inp.focus();
+}
+
+function highlight(){
+  document.querySelectorAll('.tts td').forEach(function(td){td.classList.remove('hl-word','hl-cur');});
+  if(!aw) return;
+  for(var i=0;i<aw.w.length;i++){
+    var r=aw.d==='A'?aw.r:aw.r+i,c=aw.d==='A'?aw.c+i:aw.c;
+    var td=getTd(r,c);if(td) td.classList.add('hl-word');
+  }
+  var td=getTd(ar,ac);
+  if(td){td.classList.remove('hl-word');td.classList.add('hl-cur');}
+}
+
+function hlClue(){
+  document.querySelectorAll('.ci').forEach(function(el){el.classList.remove('act');});
+  if(aw){var el=document.getElementById('ci-'+aw.id+aw.d);if(el){el.classList.add('act');el.scrollIntoView({block:'nearest'});}}
+}
+
+function onInp(e,r,c){
+  var inp=e.target;
+  inp.value=inp.value.toUpperCase().replace(/[^A-Z]/g,'');
+  if(inp.value) mvNext(r,c);
+}
+
+function onKey(e,r,c){
+  if(e.key==='Backspace'){
+    var inp=getInp(r,c);var td=getTd(r,c);
+    if(inp&&inp.value==='') mvPrev(r,c);
+    else if(inp){inp.value='';if(td) td.classList.remove('ok-cell','no-cell');}
+    e.preventDefault();
+  } else if(e.key==='ArrowRight'){if(c+1<C&&gd[r][c+1]) selCell(r,c+1,'A');e.preventDefault();}
+    else if(e.key==='ArrowLeft'){if(c-1>=0&&gd[r][c-1]) selCell(r,c-1,'A');e.preventDefault();}
+    else if(e.key==='ArrowDown'){if(r+1<R&&gd[r+1]&&gd[r+1][c]) selCell(r+1,c,'D');e.preventDefault();}
+    else if(e.key==='ArrowUp'){if(r-1>=0&&gd[r-1]&&gd[r-1][c]) selCell(r-1,c,'D');e.preventDefault();}
+    else if(e.key==='Tab'){e.preventDefault();cycleW(e.shiftKey);}
+}
+
+function idxInWord(w,r,c){
+  for(var i=0;i<w.w.length;i++){
+    var wr=w.d==='A'?w.r:w.r+i,wc=w.d==='A'?w.c+i:w.c;
+    if(wr===r&&wc===c) return i;
+  }return -1;
+}
+function mvNext(r,c){
+  if(!aw) return;
+  var idx=idxInWord(aw,r,c);
+  if(idx<0||idx>=aw.w.length-1) return;
+  var nr=aw.d==='A'?aw.r:aw.r+idx+1,nc=aw.d==='A'?aw.c+idx+1:aw.c;
+  selCell(nr,nc,aw.d);
+}
+function mvPrev(r,c){
+  if(!aw) return;
+  var idx=idxInWord(aw,r,c);
+  if(idx<=0) return;
+  var nr=aw.d==='A'?aw.r:aw.r+idx-1,nc=aw.d==='A'?aw.c+idx-1:aw.c;
+  selCell(nr,nc,aw.d);
+}
+function cycleW(prev){
+  var all=wordsA.concat(wordsD);
+  var idx=0;
+  for(var i=0;i<all.length;i++){if(aw&&all[i].id===aw.id&&all[i].d===aw.d){idx=i;break;}}
+  var nx=prev?(idx-1+all.length)%all.length:(idx+1)%all.length;
+  selCell(all[nx].r,all[nx].c,all[nx].d);
+}
+
+var ca=document.getElementById('ca'),cd=document.getElementById('cd');
+wordsA.forEach(function(w){
+  var el=document.createElement('div');
+  el.className='ci';el.id='ci-'+w.id+w.d;
+  el.innerHTML='<b>'+w.id+'.</b>'+w.q;
+  el.addEventListener('click',function(){selCell(w.r,w.c,w.d);});
+  ca.appendChild(el);
+});
+wordsD.forEach(function(w){
+  var el=document.createElement('div');
+  el.className='ci';el.id='ci-'+w.id+w.d;
+  el.innerHTML='<b>'+w.id+'.</b>'+w.q;
+  el.addEventListener('click',function(){selCell(w.r,w.c,w.d);});
+  cd.appendChild(el);
+});
+
+function cek(){
+  var benar=0;
+  words.forEach(function(w){
+    var ok=true;
+    for(var i=0;i<w.w.length;i++){
+      var r=w.d==='A'?w.r:w.r+i,c=w.d==='A'?w.c+i:w.c;
+      var inp=getInp(r,c);var td=getTd(r,c);
+      if(inp&&td){
+        td.classList.remove('ok-cell','no-cell');
+        if((inp.value||'').toUpperCase()===w.w[i]) td.classList.add('ok-cell');
+        else{td.classList.add('no-cell');ok=false;}
+      }
+    }
+    var ci=document.getElementById('ci-'+w.id+w.d);
+    if(ok){benar++;if(ci) ci.classList.add('done');}
+    else if(ci) ci.classList.remove('done');
+  });
+  var st=document.getElementById('st');
+  st.style.display='block';
+  st.textContent='Benar: '+benar+' dari '+words.length+' kata';
+  document.getElementById('win').style.display=benar===words.length?'block':'none';
+}
+
+function resetGrid(){
+  document.querySelectorAll('.tts input').forEach(function(i){i.value='';});
+  document.querySelectorAll('.tts td').forEach(function(td){td.classList.remove('ok-cell','no-cell','hl-word','hl-cur');});
+  document.querySelectorAll('.ci').forEach(function(el){el.classList.remove('done');});
+  document.getElementById('st').style.display='none';
+  document.getElementById('win').style.display='none';
+  aw=null;selCell(words[0].r,words[0].c,words[0].d);
+}
+
+function buka(){
+  words.forEach(function(w){
+    for(var i=0;i<w.w.length;i++){
+      var r=w.d==='A'?w.r:w.r+i,c=w.d==='A'?w.c+i:w.c;
+      var inp=getInp(r,c);var td=getTd(r,c);
+      if(inp) inp.value=w.w[i];
+      if(td){td.classList.remove('no-cell');td.classList.add('ok-cell');}
+    }
+    var ci=document.getElementById('ci-'+w.id+w.d);if(ci) ci.classList.add('done');
+  });
+  var st=document.getElementById('st');st.style.display='block';
+  st.textContent='Semua jawaban ditampilkan';
+}
+
+window.addEventListener('load',function(){selCell(words[0].r,words[0].c,words[0].d);});
+</script>
+</body>
+</html>
+
+<!-- ===================== BAB 7 ===================== -->
+<div class="wrap" style="margin-top:32px">
+  <div class="hdr">
+    <h1>Teka-Teki Silang — Bab 7 PAI Kelas 4</h1>
+    <p>Beriman kepada Rasul-Rasul Allah</p>
+  </div>
+  <div class="body">
+    <div class="grid-side">
+      <table class="tts" id="tbl7"></table>
+      <div class="btns">
+        <button class="primary" onclick="cek7()">Cek Jawaban</button>
+        <button onclick="resetGrid7()">Reset</button>
+        
+      </div>
+      <div class="status" id="st7"></div>
+      <div class="win" id="win7">&#127881; Selamat! Semua jawaban benar!</div>
+    </div>
+    <div class="clue-side">
+      <div class="sec">
+        <div class="cs-title">Mendatar &rarr;</div>
+        <div id="ca7"></div>
+      </div>
+      <div class="sec">
+        <div class="cs-title">Menurun &darr;</div>
+        <div id="cd7"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+var R=13,C=13;
+var wordDefs=[
+  {w:'SIDIK',      r:0,  c:0,  d:'A', q:'Sifat wajib rasul: berucap dan bertingkah laku yang benar (jujur)'},
+  {w:'AMANAH',     r:0,  c:6,  d:'A', q:'Sifat wajib rasul: dapat dipercaya, tidak berkhianat'},
+  {w:'TABLIG',     r:2,  c:0,  d:'A', q:'Sifat wajib rasul: menyampaikan seluruh wahyu kepada umat'},
+  {w:'FATANAH',    r:4,  c:0,  d:'A', q:'Sifat wajib rasul: cerdas dan bijaksana'},
+  {w:'KIZIB',      r:4,  c:8,  d:'A', q:'Sifat mustahil rasul: lawan dari sidik (dusta)'},
+  {w:'KHIANAT',    r:6,  c:0,  d:'A', q:'Sifat mustahil rasul: lawan dari amanah'},
+  {w:'KITMAN',     r:6,  c:8,  d:'A', q:'Sifat mustahil rasul: menyembunyikan wahyu'},
+  {w:'BALADAH',    r:8,  c:0,  d:'A', q:'Sifat mustahil rasul: lawan dari fatanah (bodoh)'},
+  {w:'WAHYU',      r:10, c:0,  d:'A', q:'Pesan Allah yang diterima dan disampaikan rasul kepada umat'},
+  {w:'ULUL',       r:10, c:6,  d:'A', q:'Sebutan rasul dengan keteguhan hati kuat: rasul ___ azmi'},
+  {w:'RASUL',      r:12, c:0,  d:'A', q:'Utusan Allah yang wajib menyampaikan wahyu kepada manusia'},
+  {w:'STAF',       r:0,  c:0,  d:'D', q:'Singkatan empat sifat wajib rasul: Sidik, Tablig, Amanah, Fatanah'},
+  {w:'IMAN',       r:0,  c:4,  d:'D', q:'Percaya dengan sepenuh hati kepada rukun iman'},
+  {w:'NABI',       r:0,  c:6,  d:'D', q:'Lelaki pilihan Allah yang diberi wahyu untuk dirinya sendiri'},
+  {w:'MUHAMMAD',   r:0,  c:12, d:'D', q:'Rasul terakhir, penutup para nabi, utusan untuk seluruh alam'},
+  {w:'AKHLAK',     r:4,  c:2,  d:'D', q:'Tujuan diutusnya Rasul: menyempurnakan ___ manusia'},
+  {w:'KABAR',      r:6,  c:8,  d:'D', q:'Rasul diutus menyampaikan ___ gembira dan ___ buruk'},
+];
+
+var gd=[];
+for(var i=0;i<R;i++){gd.push([]);for(var j=0;j<C;j++) gd[i].push(null);}
+wordDefs.forEach(function(w){
+  for(var i=0;i<w.w.length;i++){
+    var r=w.d==='A'?w.r:w.r+i, c=w.d==='A'?w.c+i:w.c;
+    if(!gd[r][c]) gd[r][c]={letter:w.w[i]};
+    else gd[r][c].letter=w.w[i];
+  }
+});
+
+var startCells={};
+wordDefs.forEach(function(w){ startCells[w.r+','+w.c]=true; });
+
+var cellNum=[];
+for(var i=0;i<R;i++){cellNum.push([]);for(var j=0;j<C;j++) cellNum[i].push(0);}
+var counter=1;
+for(var r=0;r<R;r++){
+  for(var c=0;c<C;c++){
+    if(startCells[r+','+c]) cellNum[r][c]=counter++;
+  }
+}
+
+var words=[];
+wordDefs.forEach(function(wd){
+  var num=cellNum[wd.r][wd.c];
+  if(num>0) words.push({id:num,w:wd.w,r:wd.r,c:wd.c,d:wd.d,q:wd.q});
+});
+var wordsA=words.filter(function(w){return w.d==='A';}).sort(function(a,b){return a.id-b.id;});
+var wordsD=words.filter(function(w){return w.d==='D';}).sort(function(a,b){return a.id-b.id;});
+
+var tbl=document.getElementById('tbl7');
+for(var r=0;r<R;r++){
+  var tr=document.createElement('tr');
+  for(var c=0;c<C;c++){
+    var td=document.createElement('td');
+    if(!gd[r][c]){td.className='blk';}
+    else{
+      if(cellNum[r][c]>0){
+        var sp=document.createElement('span');
+        sp.className='cnum';sp.textContent=cellNum[r][c];td.appendChild(sp);
+      }
+      var inp=document.createElement('input');
+      inp.type='text';inp.maxLength=1;
+      (function(rr,cc){
+        inp.addEventListener('mousedown',function(e){e.preventDefault();selCell7(rr,cc);this.focus();});
+        inp.addEventListener('keydown',function(e){onKey7(e,rr,cc);});
+        inp.addEventListener('input',function(e){onInp7(e,rr,cc);});
+      })(r,c);
+      td.appendChild(inp);
+    }
+    tr.appendChild(td);
+  }
+  tbl.appendChild(tr);
+}
+
+var aw=null,adir='A',ar=0,ac=0;
+function getInp(r,c){return document.querySelector('#tbl7 tr:nth-child('+(r+1)+') td:nth-child('+(c+1)+') input');}
+function getTd(r,c){return document.querySelector('#tbl7 tr:nth-child('+(r+1)+') td:nth-child('+(c+1)+')');}
+function wordAt(r,c,dir){
+  for(var i=0;i<words.length;i++){
+    var w=words[i];if(w.d!==dir) continue;
+    for(var j=0;j<w.w.length;j++){
+      var wr=w.d==='A'?w.r:w.r+j,wc=w.d==='A'?w.c+j:w.c;
+      if(wr===r&&wc===c) return w;
+    }
+  }return null;
+}
+function selCell7(r,c,dir){
+  if(!gd[r]||!gd[r][c]) return;
+  var d=dir||adir;
+  var w=wordAt(r,c,d);
+  if(!w){d=d==='A'?'D':'A';w=wordAt(r,c,d);}
+  if(!w) return;
+  if(aw&&aw.id===w.id&&aw.d===w.d&&ar===r&&ac===c){
+    var nd=adir==='A'?'D':'A';var nw=wordAt(r,c,nd);
+    if(nw){w=nw;d=nd;}
+  }
+  aw=w;adir=d;ar=r;ac=c;
+  highlight7();hlClue7();
+  var inp=getInp(r,c);if(inp) inp.focus();
+}
+function highlight7(){
+  document.querySelectorAll('#tbl7 td').forEach(function(td){td.classList.remove('hl-word','hl-cur');});
+  if(!aw) return;
+  for(var i=0;i<aw.w.length;i++){
+    var r=aw.d==='A'?aw.r:aw.r+i,c=aw.d==='A'?aw.c+i:aw.c;
+    var td=getTd(r,c);if(td) td.classList.add('hl-word');
+  }
+  var td=getTd(ar,ac);
+  if(td){td.classList.remove('hl-word');td.classList.add('hl-cur');}
+}
+function hlClue7(){
+  document.querySelectorAll('#ca7 .ci,#cd7 .ci').forEach(function(el){el.classList.remove('act');});
+  if(aw){var el=document.getElementById('ci7-'+aw.id+aw.d);if(el){el.classList.add('act');el.scrollIntoView({block:'nearest'});}}
+}
+function onInp7(e,r,c){
+  var inp=e.target;inp.value=inp.value.toUpperCase().replace(/[^A-Z]/g,'');
+  if(inp.value) mvNext7(r,c);
+}
+function onKey7(e,r,c){
+  if(e.key==='Backspace'){
+    var inp=getInp(r,c);var td=getTd(r,c);
+    if(inp&&inp.value==='') mvPrev7(r,c);
+    else if(inp){inp.value='';if(td) td.classList.remove('ok-cell','no-cell');}
+    e.preventDefault();
+  } else if(e.key==='ArrowRight'){if(c+1<C&&gd[r][c+1]) selCell7(r,c+1,'A');e.preventDefault();}
+    else if(e.key==='ArrowLeft'){if(c-1>=0&&gd[r][c-1]) selCell7(r,c-1,'A');e.preventDefault();}
+    else if(e.key==='ArrowDown'){if(r+1<R&&gd[r+1]&&gd[r+1][c]) selCell7(r+1,c,'D');e.preventDefault();}
+    else if(e.key==='ArrowUp'){if(r-1>=0&&gd[r-1]&&gd[r-1][c]) selCell7(r-1,c,'D');e.preventDefault();}
+    else if(e.key==='Tab'){e.preventDefault();cycleW7(e.shiftKey);}
+}
+function idxInWord(w,r,c){
+  for(var i=0;i<w.w.length;i++){
+    var wr=w.d==='A'?w.r:w.r+i,wc=w.d==='A'?w.c+i:w.c;
+    if(wr===r&&wc===c) return i;
+  }return -1;
+}
+function mvNext7(r,c){
+  if(!aw) return;var idx=idxInWord(aw,r,c);
+  if(idx<0||idx>=aw.w.length-1) return;
+  var nr=aw.d==='A'?aw.r:aw.r+idx+1,nc=aw.d==='A'?aw.c+idx+1:aw.c;
+  selCell7(nr,nc,aw.d);
+}
+function mvPrev7(r,c){
+  if(!aw) return;var idx=idxInWord(aw,r,c);
+  if(idx<=0) return;
+  var nr=aw.d==='A'?aw.r:aw.r+idx-1,nc=aw.d==='A'?aw.c+idx-1:aw.c;
+  selCell7(nr,nc,aw.d);
+}
+function cycleW7(prev){
+  var all=wordsA.concat(wordsD);
+  var idx=0;for(var i=0;i<all.length;i++){if(aw&&all[i].id===aw.id&&all[i].d===aw.d){idx=i;break;}}
+  var nx=prev?(idx-1+all.length)%all.length:(idx+1)%all.length;
+  selCell7(all[nx].r,all[nx].c,all[nx].d);
+}
+
+var ca=document.getElementById('ca7'),cd=document.getElementById('cd7');
+wordsA.forEach(function(w){
+  var el=document.createElement('div');el.className='ci';el.id='ci7-'+w.id+w.d;
+  el.innerHTML='<b>'+w.id+'.</b>'+w.q;
+  el.addEventListener('click',function(){selCell7(w.r,w.c,w.d);});
+  ca.appendChild(el);
+});
+wordsD.forEach(function(w){
+  var el=document.createElement('div');el.className='ci';el.id='ci7-'+w.id+w.d;
+  el.innerHTML='<b>'+w.id+'.</b>'+w.q;
+  el.addEventListener('click',function(){selCell7(w.r,w.c,w.d);});
+  cd.appendChild(el);
+});
+
+window.cek7=function(){
+  var benar=0;
+  words.forEach(function(w){
+    var ok=true;
+    for(var i=0;i<w.w.length;i++){
+      var r=w.d==='A'?w.r:w.r+i,c=w.d==='A'?w.c+i:w.c;
+      var inp=getInp(r,c);var td=getTd(r,c);
+      if(inp&&td){
+        td.classList.remove('ok-cell','no-cell');
+        if((inp.value||'').toUpperCase()===w.w[i]) td.classList.add('ok-cell');
+        else{td.classList.add('no-cell');ok=false;}
+      }
+    }
+    var ci=document.getElementById('ci7-'+w.id+w.d);
+    if(ok){benar++;if(ci) ci.classList.add('done');}
+    else if(ci) ci.classList.remove('done');
+  });
+  var st=document.getElementById('st7');
+  st.style.display='block';st.textContent='Benar: '+benar+' dari '+words.length+' kata';
+  document.getElementById('win7').style.display=benar===words.length?'block':'none';
+};
+window.resetGrid7=function(){
+  document.querySelectorAll('#tbl7 input').forEach(function(i){i.value='';});
+  document.querySelectorAll('#tbl7 td').forEach(function(td){td.classList.remove('ok-cell','no-cell','hl-word','hl-cur');});
+  document.querySelectorAll('#ca7 .ci,#cd7 .ci').forEach(function(el){el.classList.remove('done');});
+  document.getElementById('st7').style.display='none';
+  document.getElementById('win7').style.display='none';
+  aw=null;selCell7(words[0].r,words[0].c,words[0].d);
+};
+window.buka7=function(){
+  words.forEach(function(w){
+    for(var i=0;i<w.w.length;i++){
+      var r=w.d==='A'?w.r:w.r+i,c=w.d==='A'?w.c+i:w.c;
+      var inp=getInp(r,c);var td=getTd(r,c);
+      if(inp) inp.value=w.w[i];
+      if(td){td.classList.remove('no-cell');td.classList.add('ok-cell');}
+    }
+    var ci=document.getElementById('ci7-'+w.id+w.d);if(ci) ci.classList.add('done');
+  });
+  var st=document.getElementById('st7');st.style.display='block';
+  st.textContent='Semua jawaban ditampilkan';
+};
+
+selCell7(words[0].r,words[0].c,words[0].d);
+})();
+</script>
+
+<!-- ===================== BAB 8 ===================== -->
+<div class="wrap" style="margin-top:32px">
+  <div class="hdr">
+    <h1>Teka-Teki Silang — Bab 8 PAI Kelas 4</h1>
+    <p>Aku Anak Saleh</p>
+  </div>
+  <div class="body">
+    <div class="grid-side">
+      <table class="tts" id="tbl8"></table>
+      <div class="btns">
+        <button class="primary" onclick="cek8()">Cek Jawaban</button>
+        <button onclick="resetGrid8()">Reset</button>
+        
+      </div>
+      <div class="status" id="st8"></div>
+      <div class="win" id="win8">&#127881; Selamat! Semua jawaban benar!</div>
+    </div>
+    <div class="clue-side">
+      <div class="sec"><div class="cs-title">Mendatar &rarr;</div><div id="ca8"></div></div>
+      <div class="sec"><div class="cs-title">Menurun &darr;</div><div id="cd8"></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== BAB 9 ===================== -->
+<div class="wrap" style="margin-top:32px">
+  <div class="hdr">
+    <h1>Teka-Teki Silang — Bab 9 PAI Kelas 4</h1>
+    <p>Mengenal Salat Jumat, Duha dan Tahajud</p>
+  </div>
+  <div class="body">
+    <div class="grid-side">
+      <table class="tts" id="tbl9"></table>
+      <div class="btns">
+        <button class="primary" onclick="cek9()">Cek Jawaban</button>
+        <button onclick="resetGrid9()">Reset</button>
+        
+      </div>
+      <div class="status" id="st9"></div>
+      <div class="win" id="win9">&#127881; Selamat! Semua jawaban benar!</div>
+    </div>
+    <div class="clue-side">
+      <div class="sec"><div class="cs-title">Mendatar &rarr;</div><div id="ca9"></div></div>
+      <div class="sec"><div class="cs-title">Menurun &darr;</div><div id="cd9"></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== BAB 10 ===================== -->
+<div class="wrap" style="margin-top:32px">
+  <div class="hdr">
+    <h1>Teka-Teki Silang — Bab 10 PAI Kelas 4</h1>
+    <p>Kisah Nabi Muhammad saw. Membangun Kota Madinah</p>
+  </div>
+  <div class="body">
+    <div class="grid-side">
+      <table class="tts" id="tbl10"></table>
+      <div class="btns">
+        <button class="primary" onclick="cek10()">Cek Jawaban</button>
+        <button onclick="resetGrid10()">Reset</button>
+        
+      </div>
+      <div class="status" id="st10"></div>
+      <div class="win" id="win10">&#127881; Selamat! Semua jawaban benar!</div>
+    </div>
+    <div class="clue-side">
+      <div class="sec"><div class="cs-title">Mendatar &rarr;</div><div id="ca10"></div></div>
+      <div class="sec"><div class="cs-title">Menurun &darr;</div><div id="cd10"></div></div>
+    </div>
+  </div>
+</div>
+
+<script>
+function buildTTS(cfg){
+  var R=13,C=13;
+  var wordDefs=cfg.words, tblId=cfg.tblId, prefix=cfg.prefix;
+  var gd=[];
+  for(var i=0;i<R;i++){gd.push([]);for(var j=0;j<C;j++) gd[i].push(null);}
+  wordDefs.forEach(function(w){
+    for(var i=0;i<w.w.length;i++){
+      var r=w.d==='A'?w.r:w.r+i,c=w.d==='A'?w.c+i:w.c;
+      if(!gd[r][c]) gd[r][c]={letter:w.w[i]};
+      else gd[r][c].letter=w.w[i];
+    }
+  });
+  var startCells={};
+  wordDefs.forEach(function(w){startCells[w.r+','+w.c]=true;});
+  var cellNum=[];
+  for(var i=0;i<R;i++){cellNum.push([]);for(var j=0;j<C;j++) cellNum[i].push(0);}
+  var counter=1;
+  for(var r=0;r<R;r++) for(var c=0;c<C;c++) if(startCells[r+','+c]) cellNum[r][c]=counter++;
+  var words=[];
+  wordDefs.forEach(function(wd){
+    var num=cellNum[wd.r][wd.c];
+    if(num>0) words.push({id:num,w:wd.w,r:wd.r,c:wd.c,d:wd.d,q:wd.q});
+  });
+  var wordsA=words.filter(function(w){return w.d==='A';}).sort(function(a,b){return a.id-b.id;});
+  var wordsD=words.filter(function(w){return w.d==='D';}).sort(function(a,b){return a.id-b.id;});
+
+  var tbl=document.getElementById(tblId);
+  for(var r=0;r<R;r++){
+    var tr=document.createElement('tr');
+    for(var c=0;c<C;c++){
+      var td=document.createElement('td');
+      if(!gd[r][c]){td.className='blk';}
+      else{
+        if(cellNum[r][c]>0){var sp=document.createElement('span');sp.className='cnum';sp.textContent=cellNum[r][c];td.appendChild(sp);}
+        var inp=document.createElement('input');inp.type='text';inp.maxLength=1;
+        (function(rr,cc){
+          inp.addEventListener('mousedown',function(e){e.preventDefault();sc(rr,cc);this.focus();});
+          inp.addEventListener('keydown',function(e){ok(e,rr,cc);});
+          inp.addEventListener('input',function(e){oi(e,rr,cc);});
+        })(r,c);
+        td.appendChild(inp);
+      }
+      tr.appendChild(td);
+    }
+    tbl.appendChild(tr);
+  }
+
+  var aw=null,adir='A',ar=0,ac=0;
+  function gi(r,c){return document.querySelector('#'+tblId+' tr:nth-child('+(r+1)+') td:nth-child('+(c+1)+') input');}
+  function gt(r,c){return document.querySelector('#'+tblId+' tr:nth-child('+(r+1)+') td:nth-child('+(c+1)+')');}
+  function wa(r,c,dir){
+    for(var i=0;i<words.length;i++){var w=words[i];if(w.d!==dir) continue;for(var j=0;j<w.w.length;j++){var wr=w.d==='A'?w.r:w.r+j,wc=w.d==='A'?w.c+j:w.c;if(wr===r&&wc===c) return w;}}return null;
+  }
+  function sc(r,c,dir){
+    if(!gd[r]||!gd[r][c]) return;
+    var d=dir||adir,w=wa(r,c,d);
+    if(!w){d=d==='A'?'D':'A';w=wa(r,c,d);}
+    if(!w) return;
+    if(aw&&aw.id===w.id&&aw.d===w.d&&ar===r&&ac===c){var nd=adir==='A'?'D':'A';var nw=wa(r,c,nd);if(nw){w=nw;d=nd;}}
+    aw=w;adir=d;ar=r;ac=c;hl();hlc();
+    var inp=gi(r,c);if(inp) inp.focus();
+  }
+  function hl(){
+    document.querySelectorAll('#'+tblId+' td').forEach(function(td){td.classList.remove('hl-word','hl-cur');});
+    if(!aw) return;
+    for(var i=0;i<aw.w.length;i++){var r=aw.d==='A'?aw.r:aw.r+i,c=aw.d==='A'?aw.c+i:aw.c;var td=gt(r,c);if(td) td.classList.add('hl-word');}
+    var td=gt(ar,ac);if(td){td.classList.remove('hl-word');td.classList.add('hl-cur');}
+  }
+  function hlc(){
+    document.querySelectorAll('#ca'+prefix+' .ci,#cd'+prefix+' .ci').forEach(function(el){el.classList.remove('act');});
+    if(aw){var el=document.getElementById('ci'+prefix+'-'+aw.id+aw.d);if(el){el.classList.add('act');el.scrollIntoView({block:'nearest'});}}
+  }
+  function oi(e,r,c){var inp=e.target;inp.value=inp.value.toUpperCase().replace(/[^A-Z]/g,'');if(inp.value) mn(r,c);}
+  function ok(e,r,c){
+    if(e.key==='Backspace'){var inp=gi(r,c);var td=gt(r,c);if(inp&&inp.value==='') mp(r,c);else if(inp){inp.value='';if(td) td.classList.remove('ok-cell','no-cell');}e.preventDefault();}
+    else if(e.key==='ArrowRight'){if(c+1<C&&gd[r][c+1]) sc(r,c+1,'A');e.preventDefault();}
+    else if(e.key==='ArrowLeft'){if(c-1>=0&&gd[r][c-1]) sc(r,c-1,'A');e.preventDefault();}
+    else if(e.key==='ArrowDown'){if(r+1<R&&gd[r+1]&&gd[r+1][c]) sc(r+1,c,'D');e.preventDefault();}
+    else if(e.key==='ArrowUp'){if(r-1>=0&&gd[r-1]&&gd[r-1][c]) sc(r-1,c,'D');e.preventDefault();}
+    else if(e.key==='Tab'){e.preventDefault();cw(e.shiftKey);}
+  }
+  function ii(w,r,c){for(var i=0;i<w.w.length;i++){var wr=w.d==='A'?w.r:w.r+i,wc=w.d==='A'?w.c+i:w.c;if(wr===r&&wc===c) return i;}return -1;}
+  function mn(r,c){if(!aw) return;var idx=ii(aw,r,c);if(idx<0||idx>=aw.w.length-1) return;var nr=aw.d==='A'?aw.r:aw.r+idx+1,nc=aw.d==='A'?aw.c+idx+1:aw.c;sc(nr,nc,aw.d);}
+  function mp(r,c){if(!aw) return;var idx=ii(aw,r,c);if(idx<=0) return;var nr=aw.d==='A'?aw.r:aw.r+idx-1,nc=aw.d==='A'?aw.c+idx-1:aw.c;sc(nr,nc,aw.d);}
+  function cw(prev){var all=wordsA.concat(wordsD);var idx=0;for(var i=0;i<all.length;i++){if(aw&&all[i].id===aw.id&&all[i].d===aw.d){idx=i;break;}}var nx=prev?(idx-1+all.length)%all.length:(idx+1)%all.length;sc(all[nx].r,all[nx].c,all[nx].d);}
+
+  var ca=document.getElementById('ca'+prefix),cd=document.getElementById('cd'+prefix);
+  wordsA.forEach(function(w){var el=document.createElement('div');el.className='ci';el.id='ci'+prefix+'-'+w.id+w.d;el.innerHTML='<b>'+w.id+'.</b>'+w.q;el.addEventListener('click',function(){sc(w.r,w.c,w.d);});ca.appendChild(el);});
+  wordsD.forEach(function(w){var el=document.createElement('div');el.className='ci';el.id='ci'+prefix+'-'+w.id+w.d;el.innerHTML='<b>'+w.id+'.</b>'+w.q;el.addEventListener('click',function(){sc(w.r,w.c,w.d);});cd.appendChild(el);});
+
+  window['cek'+prefix]=function(){
+    var benar=0;
+    words.forEach(function(w){var ok=true;for(var i=0;i<w.w.length;i++){var r=w.d==='A'?w.r:w.r+i,c=w.d==='A'?w.c+i:w.c;var inp=gi(r,c);var td=gt(r,c);if(inp&&td){td.classList.remove('ok-cell','no-cell');if((inp.value||'').toUpperCase()===w.w[i]) td.classList.add('ok-cell');else{td.classList.add('no-cell');ok=false;}}}
+    var ci=document.getElementById('ci'+prefix+'-'+w.id+w.d);if(ok){benar++;if(ci) ci.classList.add('done');}else if(ci) ci.classList.remove('done');});
+    var st=document.getElementById('st'+prefix);st.style.display='block';st.textContent='Benar: '+benar+' dari '+words.length+' kata';
+    document.getElementById('win'+prefix).style.display=benar===words.length?'block':'none';
+  };
+  window['resetGrid'+prefix]=function(){
+    document.querySelectorAll('#'+tblId+' input').forEach(function(i){i.value='';});
+    document.querySelectorAll('#'+tblId+' td').forEach(function(td){td.classList.remove('ok-cell','no-cell','hl-word','hl-cur');});
+    document.querySelectorAll('#ca'+prefix+' .ci,#cd'+prefix+' .ci').forEach(function(el){el.classList.remove('done');});
+    document.getElementById('st'+prefix).style.display='none';document.getElementById('win'+prefix).style.display='none';
+    aw=null;sc(words[0].r,words[0].c,words[0].d);
+  };
+  window['buka'+prefix]=function(){
+    words.forEach(function(w){for(var i=0;i<w.w.length;i++){var r=w.d==='A'?w.r:w.r+i,c=w.d==='A'?w.c+i:w.c;var inp=gi(r,c);var td=gt(r,c);if(inp) inp.value=w.w[i];if(td){td.classList.remove('no-cell');td.classList.add('ok-cell');}}
+    var ci=document.getElementById('ci'+prefix+'-'+w.id+w.d);if(ci) ci.classList.add('done');});
+    var st=document.getElementById('st'+prefix);st.style.display='block';st.textContent='Semua jawaban ditampilkan';
+  };
+  sc(words[0].r,words[0].c,words[0].d);
+}
+
+// BAB 8
+buildTTS({tblId:'tbl8',prefix:'8',words:[
+  {w:'SALAM',     r:0,  c:0,  d:'A', q:'Ucapan assalamualaikum; artinya damai dan pernyataan hormat'},
+  {w:'MUNAFIK',   r:0,  c:6,  d:'A', q:'Orang yang bermuka dua; berpura-pura beriman'},
+  {w:'JUJUR',     r:2,  c:0,  d:'A', q:'Lurus hati, tidak berbohong, berkata apa adanya'},
+  {w:'AMANAH',    r:2,  c:6,  d:'A', q:'Sesuatu yang dipercayakan atau dititipkan; dapat dipercaya'},
+  {w:'MENOLONG',  r:4,  c:0,  d:'A', q:'Sikap saling membantu dalam kebaikan dan takwa'},
+  {w:'DUSTA',     r:4,  c:10, d:'A', q:'Ciri munafik pertama: berkata tidak jujur (bohong)'},
+  {w:'DAMAI',     r:6,  c:0,  d:'A', q:'Arti kata salam; tujuan menyebarkan salam'},
+  {w:'KHIANAT',   r:8,  c:0,  d:'A', q:'Ciri munafik ketiga: mengingkari kepercayaan yang diberikan'},
+  {w:'SALEH',     r:10, c:0,  d:'A', q:'Anak yang berperilaku baik dan meneladani akhlak Rasul'},
+  {w:'INSYAALLAH',r:12, c:0,  d:'A', q:'Ucapan saat berjanji: jika Allah berkehendak'},
+  {w:'SUNAH',     r:0,  c:0,  d:'D', q:'Hukum mengucapkan salam: wajib dijawab, hukum mengucapkan adalah ...'},
+  {w:'JANJI',     r:0,  c:4,  d:'D', q:'Ciri munafik kedua: jika berjanji ia mengingkari ...'},
+  {w:'MUSLIM',    r:0,  c:6,  d:'D', q:'Orang yang memeluk agama Islam'},
+  {w:'AKHLAK',    r:2,  c:2,  d:'D', q:'Agama adalah ... yang baik (HR. Bukhari)'},
+  {w:'TAKWA',     r:4,  c:8,  d:'D', q:'Tolong-menolong dalam kebaikan dan ...'},
+  {w:'AMIN',      r:6,  c:12, d:'D', q:'Artinya dapat dipercaya; julukan Nabi Muhammad saw.'},
+]});
+
+// BAB 9
+buildTTS({tblId:'tbl9',prefix:'9',words:[
+  {w:'JUMAT',     r:0,  c:0,  d:'A', q:'Salat fardu dua rakaat di waktu zuhur hari ...'},
+  {w:'KHUTBAH',   r:0,  c:6,  d:'A', q:'Pidato wajib sebelum salat Jumat; dilakukan dua kali'},
+  {w:'DUHA',      r:2,  c:0,  d:'A', q:'Salat sunah yang dilakukan saat matahari mulai naik hingga menjelang zuhur'},
+  {w:'MUAKKAD',   r:2,  c:5,  d:'A', q:'Salat sunah yang sangat dianjurkan untuk dikerjakan'},
+  {w:'TAHAJUD',   r:4,  c:0,  d:'A', q:'Salat sunah yang dilakukan di malam hari setelah tidur'},
+  {w:'WITIR',     r:4,  c:8,  d:'A', q:'Salat penutup malam dengan rakaat ganjil'},
+  {w:'IMAM',      r:6,  c:0,  d:'A', q:'Pemimpin salat berjemaah'},
+  {w:'FARDU',     r:6,  c:5,  d:'A', q:'Hukum salat Jumat: ... ain (wajib bagi setiap orang)'},
+  {w:'RAKAAT',    r:8,  c:0,  d:'A', q:'Salat Jumat dilakukan dua ...'},
+  {w:'KIBLAT',    r:8,  c:7,  d:'A', q:'Arah menghadap ketika salat: menghadap ...'},
+  {w:'AZAN',      r:10, c:0,  d:'A', q:'Seruan untuk memberitahu masuknya waktu salat'},
+  {w:'MASJID',    r:10, c:6,  d:'A', q:'Tempat pelaksanaan salat Jumat secara berjemaah'},
+  {w:'IKAMAH',    r:12, c:0,  d:'A', q:'Seruan pertanda salat akan segera dimulai'},
+  {w:'JEMAAH',    r:0,  c:6,  d:'D', q:'Salat yang dilakukan bersama-sama dipimpin imam'},
+  {w:'TATATAWWU', r:2,  c:4,  d:'D', q:'Salat sunah; artinya perbuatan taat yang tidak wajib (tatawwu)'},
+  {w:'WUDU',      r:4,  c:8,  d:'D', q:'Bersuci sebelum melaksanakan salat'},
+  {w:'MUAZIN',    r:6,  c:12, d:'D', q:'Orang yang mengumandangkan azan dan ikamah'},
+]});
+
+// BAB 10
+buildTTS({tblId:'tbl10',prefix:'10',words:[
+  {w:'NABAWI',    r:0,  c:0,  d:'A', q:'Nama masjid yang pertama dibangun Rasul di Madinah: Masjid ...'},
+  {w:'HIJRAH',    r:0,  c:7,  d:'A', q:'Perpindahan Rasul dan sahabat dari Makkah ke Madinah'},
+  {w:'MUHAJIRIN', r:2,  c:0,  d:'A', q:'Orang-orang yang berhijrah dari Makkah ke Madinah'},
+  {w:'ANSAR',     r:4,  c:0,  d:'A', q:'Penduduk Madinah yang menolong kaum Muhajirin; artinya penolong'},
+  {w:'UKHUWAH',   r:4,  c:6,  d:'A', q:'Persaudaraan yang dijalin Rasul antara Muhajirin dan Ansar'},
+  {w:'MADINAH',   r:6,  c:0,  d:'A', q:'Kota tujuan hijrah Nabi Muhammad saw.'},
+  {w:'PIAGAM',    r:6,  c:8,  d:'A', q:'Perjanjian kerukunan antar penduduk Madinah: ... Madinah'},
+  {w:'QUBA',      r:8,  c:0,  d:'A', q:'Nama masjid pertama yang dibangun Rasul dalam perjalanan hijrah'},
+  {w:'GOTONG',    r:8,  c:5,  d:'A', q:'Cara membangun Masjid Nabawi: Rasul bersama sahabat ... royong'},
+  {w:'MAKKAH',    r:10, c:0,  d:'A', q:'Kota asal Nabi Muhammad saw. sebelum hijrah'},
+  {w:'TOLERAN',   r:10, c:7,  d:'A', q:'Sikap menghargai perbedaan suku, bahasa, dan agama'},
+  {w:'KURMA',     r:12, c:0,  d:'A', q:'Bahan tiang dan atap Masjid Nabawi yang pertama'},
+  {w:'MUSLIM',    r:12, c:7,  d:'A', q:'Orang beriman yang bersaudara satu sama lain'},
+  {w:'NABI',      r:0,  c:0,  d:'D', q:'Lelaki pilihan Allah yang diberi wahyu; diutus Allah'},
+  {w:'MASJID',    r:0,  c:5,  d:'D', q:'Langkah pertama Rasul di Madinah: membangun ...'},
+  {w:'HIJRAH',    r:0,  c:7,  d:'D', q:'Berpindah dari Makkah ke Madinah demi menegakkan agama'},
+  {w:'AUS',       r:4,  c:2,  d:'D', q:'Salah satu suku Ansar di Madinah bersama suku Khazraj'},
+  {w:'PIAGAM',    r:6,  c:8,  d:'D', q:'Perjanjian damai antar penduduk Madinah'},
+  {w:'IMAN',      r:8,  c:12, d:'D', q:'Modal yang dibawa Muhajirin saat hijrah: ... kepada Allah'},
+]});
+</script>
